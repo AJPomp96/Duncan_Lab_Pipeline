@@ -37,7 +37,7 @@ process make_rRNA_db{
     path("*.g19.fa")
 
     script:
-    """
+    '''
     wget ftp://ftp.ebi.ac.uk/pub/databases/RNAcentral/releases/12.0/sequences/rnacentral_species_specific_ids.fasta.gz
     
     #Convert multi-line sequences to single-line (uses fasta_formatter from FASTX-Toolkit)
@@ -67,5 +67,5 @@ process make_rRNA_db{
         in=rRNA.${params.species}.fa \
         out=rRNA.${params.species}.g19.fa \
         minlength=19
-    """
+    '''
 }
