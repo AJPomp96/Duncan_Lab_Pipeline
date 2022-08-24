@@ -8,6 +8,7 @@ Adam Faranda
 Suhotro Gorai
 Patrick Dopler
 Methodology adapted from https://github.com/SciLifeLab/NGI-RNAseq/blob/3ffd8fe92d4ba39dfc96e36f67156dc7679808e8/main.nf#L161-L168
+https://github.com/igordot/genomics/blob/master/workflows/rrna-ref.md
 */
 
 /*

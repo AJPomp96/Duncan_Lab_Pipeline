@@ -19,9 +19,7 @@ Enable Nextflow DSL2
 */
 nextflow.enable.dsl=2
 
-/*
-Configurable variables for pipeline
-*/
+//Configurable variables for pipeline
 params.species = "mus_musculus"
 params.ensemblrelease = '107'
 params.GRC = '39'
@@ -35,18 +33,13 @@ params.unstranded = false
 params.rmrRNA = true
 params.aligner = 'hisat2'
 
-/*
-Include modules to main pipeline
-*/
-include { make_rRNA_db } from './modules/make_rRNA_db.nf'
+//Include modules to main pipeline
+include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species)
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
 include { fastqc as ribotrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'ribotrim_fastqc')
 include { trim_galore } from './modules/trim_galore.nf'
-
-
-
 
 //Only include rmRNA processes if user wants ribosomal RNA filtering (default = true)
 if( params.rmrRNA ){
@@ -76,7 +69,8 @@ Channel
     .set{ reads_ch }
 
 /*
-PREPROCESSING: Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
+PREPROCESSING: 
+Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
 workflow preprocess {
     //Generate rRNA db for specified species (default = mus musculus)
@@ -85,7 +79,8 @@ workflow preprocess {
 }
 
 /*
-STEP 1: Trim reads with Trim Galore, Filter reads for rRNA, Perform FastQC on reads before and after trim/filter
+STEP 1: 
+Trim reads with Trim Galore, Filter reads for rRNA, Perform FastQC on reads before and after trim/filter
 */
 workflow trim_filter {
     take: data
@@ -126,7 +121,8 @@ workflow trim_filter {
 }
 
 /*
-STEP 2: Align reads with specified aligner (STAR or HISAT2)
+STEP 2: 
+Align reads with specified aligner (STAR or HISAT2)
 */
 workflow alignment {
     take: data
@@ -147,7 +143,8 @@ workflow alignment {
 }
 
 /*
-MAIN: Workflow Execution
+MAIN: 
+Workflow Execution
 */
 workflow {
     preprocess()
