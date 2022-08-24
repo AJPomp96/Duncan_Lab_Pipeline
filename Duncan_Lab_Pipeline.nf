@@ -5,10 +5,10 @@ Melinda Duncan Lab
 RNA-Seq Pipeline. Started August 2022.
 
 Contributors:
-Anthony Pompetti
-Adam Faranda
-Suhotro Gorai
-Patrick Dopler
+Anthony Pompetti <ajpompet@udel.edu>
+Adam Faranda    <abf@udel.edu>
+Suhotro Gorai <sugo@udel.edu>
+Patrick Dopler <ptdopler@udel.edu>
 
 Methodology adapted from: 
 https://github.com/SciLifeLab/NGI-RNAseq/blob/3ffd8fe92d4ba39dfc96e36f67156dc7679808e8/main.nf#L161-L168
@@ -22,6 +22,7 @@ nextflow.enable.dsl=2
 /*
 Configurable variables for pipeline
 */
+params.species = "mus_musculus"
 params.ensemblrelease = '107'
 params.GRC = '39'
 params.reads = "$PWD/fastq/*{_R,_}{1,2}*.fastq.gz"
@@ -37,6 +38,7 @@ params.aligner = 'hisat2'
 /*
 Include modules to main pipeline
 */
+include { make_rRNA_db } from './modules/make_rRNA_db.nf'
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -79,6 +81,8 @@ Channel
 PREPROCESSING: Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
 workflow preprocess {
+    //Generate rRNA db for specified species (default = mus musculus)
+    make_rRNA_db()
     //Generate processes for creating indexes and downloading GTFs
 }
 
@@ -148,5 +152,6 @@ workflow alignment {
 MAIN: Workflow Execution
 */
 workflow {
-    trim_filter(reads_ch)
+    preprocess()
+    //trim_filter(reads_ch)
 }
