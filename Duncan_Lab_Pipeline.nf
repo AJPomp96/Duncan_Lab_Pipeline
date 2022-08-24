@@ -75,8 +75,6 @@ Channel
     .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
     .set{ reads_ch }
 
-Channel 
-    .fromFilePath()
 /*
 PREPROCESSING: Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
