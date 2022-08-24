@@ -28,8 +28,8 @@ params.species = "mus_musculus"
 
 process make_rRNA_db{
     executor = 'slurm'
-    memory '32 GB'
-    cpus 1
+    memory '64 GB'
+    cpus 2
 
     publishDir "${params.outdir}"
 
@@ -57,15 +57,15 @@ process make_rRNA_db{
 
     #Extract species-specific rRNA sequences
     zcat rnacentral.ribosomal.nowrap.fasta.gz \
-        | grep -A 1 -F -i "${params.species}" \
+        | grep -A 1 -F -i "!{params.species}" \
         | grep -v "^--$" \
         | fasta_formatter -w 80 \
-        > rRNA.${params.species}.fa
+        > rRNA.!{params.species}.fa
     
     #Remove sequences less than 19bp (uses reformat.sh from BBMap suite) (necessary for sortmerna process)
     reformat.sh \
-        in=rRNA.${params.species}.fa \
-        out=rRNA.${params.species}.g19.fa \
+        in=rRNA.!{params.species}.fa \
+        out=rRNA.!{params.species}.g19.fa \
         minlength=19
     '''
 }
