@@ -1,0 +1,11 @@
+#ignore everything
+*
+!*/
+
+#track these
+!.gitignore
+!modules/
+!modules/*
+!nextflow.config
+!Duncan_Lab_Pipeline.nf
+!README.md
