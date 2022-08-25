@@ -80,8 +80,11 @@ workflow preprocess {
         file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/").mkdir()
     }
     //Generate rRNA db for specified species (default = mus musculus)
-    make_rRNA_db()
-    //NEEDED: Generate processes for downloading gtf and fasta files if not present
+    //make_rRNA_db()
+    //Detect if gtf file and fasta file exist, if not download fasta and gtf
+    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.gtf").isEmpty()){
+        //downloadGTF()
+    }
 }
 
 /*
