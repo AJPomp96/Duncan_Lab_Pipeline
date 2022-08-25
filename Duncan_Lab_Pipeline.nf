@@ -36,7 +36,7 @@ params.rmrRNA = true
 params.aligner = 'hisat2'
 
 //Include modules to main pipeline
-include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species)
+include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: "./db")
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -77,7 +77,7 @@ Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 workflow preprocess {
     //Generate rRNA db for specified species (default = mus musculus)
     make_rRNA_db()
-    //Generate processes for creating indexes and downloading GTFs
+    //NEEDED: Generate processes for downloading gtf and fasta files if not present
 }
 
 /*
