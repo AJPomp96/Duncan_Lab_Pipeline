@@ -18,3 +18,16 @@ https://github.com/SciLifeLab/NGI-RNAseq/blob/3ffd8fe92d4ba39dfc96e36f67156dc767
 Enable Nextflow DSL2
 */
 nextflow.enable.dsl=2
+
+process downloadFASTA {
+    
+    output:
+    path("*.fa")
+
+    script:
+    """
+    get ${params.fasta}
+    if [ -f *.gz ]; then
+        gunzip *.gz
+    fi
+}

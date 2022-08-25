@@ -21,4 +21,14 @@ nextflow.enable.dsl=2
 
 process downloadGTF {
     
+    output:
+    path("*.gtf")
+
+    script:
+    """
+    get ${params.gtf}
+    if [ -f *.gz ]; then
+        gunzip *.gz
+    fi
+    """
 }

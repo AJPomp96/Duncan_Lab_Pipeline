@@ -22,7 +22,7 @@ nextflow.enable.dsl=2
 //Configurable variables for pipeline
 params.species = "mus_musculus"
 params.genome = false
-params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?:false : false
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.ens_rls = 107
 params.reads = "$PWD/fastq/*{_R,_}{1,2}*.fastq.gz"
@@ -36,7 +36,7 @@ params.rmrRNA = true
 params.aligner = 'hisat2'
 
 //Include modules to main pipeline
-include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: "./db")
+include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/")
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -75,6 +75,10 @@ PREPROCESSING:
 Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
 workflow preprocess {
+    //Generate folder where gtf file, fasta file, rRNA fasta, and aligner files will be contained
+    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/").isEmpty()){
+        file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/").mkdir()
+    }
     //Generate rRNA db for specified species (default = mus musculus)
     make_rRNA_db()
     //NEEDED: Generate processes for downloading gtf and fasta files if not present
