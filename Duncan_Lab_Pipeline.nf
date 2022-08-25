@@ -21,8 +21,10 @@ nextflow.enable.dsl=2
 
 //Configurable variables for pipeline
 params.species = "mus_musculus"
-params.ensemblrelease = '107'
-params.GRC = '39'
+params.genome = false
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?:false : false
+params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+params.ens_rls = 107
 params.reads = "$PWD/fastq/*{_R,_}{1,2}*.fastq.gz"
 params.singleEnd = false
 params.outdir = "./results"
