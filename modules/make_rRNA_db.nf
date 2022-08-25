@@ -36,7 +36,7 @@ process make_rRNA_db{
     output:
     path("*.g19.fa")
 
-    script:
+    shell:
     '''
     wget ftp://ftp.ebi.ac.uk/pub/databases/RNAcentral/releases/12.0/sequences/rnacentral_species_specific_ids.fasta.gz
     
