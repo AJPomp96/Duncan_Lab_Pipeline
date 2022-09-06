@@ -173,5 +173,4 @@ Workflow Execution
 */
 workflow {
     preprocess()
-    //trim_filter(reads_ch)
 }
