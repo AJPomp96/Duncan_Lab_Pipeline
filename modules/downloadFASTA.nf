@@ -19,7 +19,17 @@ Enable Nextflow DSL2
 */
 nextflow.enable.dsl=2
 
+/*
+Configurable variables for process
+*/
+params.outdir = "./db"
+
 process downloadFASTA {
+    executor = 'slurm'
+    memory '64 GB'
+    cpus 2
+
+    publishDir "${params.outdir}", mode: 'copy'
     
     output:
     path("*.fa")

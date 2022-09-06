@@ -19,16 +19,43 @@ Enable Nextflow DSL2
 */
 nextflow.enable.dsl=2
 
+/*
+Configurable variables for process
+*/
+params.outdir = "./db"
+
 process downloadGTF {
+    executor = 'slurm'
+    memory '64 GB'
+    cpus 2
+
+    publishDir "${params.outdir}", mode: 'copy'
     
     output:
     path("*.gtf")
 
-    script:
-    """
+    shell:
+    '''
     get ${params.gtf}
     if [ -f *.gz ]; then
         gunzip *.gz
     fi
-    """
+
+    #fix Lim2/Gm52993 error
+    #Lim2 is obscured by a nonsense mediated decay transcript
+    #prune Gm52993 from gtf file
+    tmpfile=$(mktemp)
+    INTERFERING_ID=ENSMUSG00000093639
+
+    wc -l $GTF_FILE
+
+    cat $GTF_FILE\
+        | grep -v $INTERFERING_ID > ${tmpfile}
+
+    cat ${tmpfile} > $GTF_FILE
+
+    rm -f ${tmpfile}
+
+    wc -l $GTF_FILE
+    '''
 }
