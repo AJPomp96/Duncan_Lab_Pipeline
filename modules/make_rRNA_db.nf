@@ -31,7 +31,7 @@ process make_rRNA_db{
     memory '64 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'link'
 
     output:
     path("*.g19.fa")

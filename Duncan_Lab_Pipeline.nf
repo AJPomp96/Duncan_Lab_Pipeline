@@ -34,11 +34,12 @@ params.reverse_stranded = false
 params.unstranded = false
 params.rmrRNA = true
 params.aligner = 'hisat2'
+params.db = "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/"
 
 //Include modules to main pipeline
-include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/")
-include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/")
-include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/")
+include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: params.db)
+include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: params.db)
+include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: params.db)
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -78,27 +79,28 @@ Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
 workflow preprocess {
     //Generate folder where gtf file, fasta file, rRNA fasta, and aligner files will be contained
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/").isEmpty()){
-        file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/").mkdir()
+    if(file(params.db).isEmpty()){
+        file(params.db).mkdir()
     }
     //Generate rRNA db for specified species (default = mus musculus)
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.g19.fa").isEmpty()){
+    if(file("${params.db}*.g19.fa").isEmpty()){
         make_rRNA_db()
     }
     //Detect if gtf file and fasta file exist, if not download fasta and gtf
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.gtf").isEmpty()){
-        //downloadGTF()
+    if(file("${params.db}*.gtf").isEmpty()){
+        downloadGTF()
         println params.gtf
     }
 
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.fa").isEmpty()){
-        //downloadFASTA()
+    if(file("${params.db}*.fa").isEmpty()){
+        downloadFASTA()
+        println params.fasta
     }
 
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.ss").isEmpty()){
+    if(file("${params.db}*.ss").isEmpty()){
         //extractSpliceSites(downloadGTF.out)
     }
-    if(file("${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/*.exon").isEmpty()){
+    if(file("${params.db}*.exon").isEmpty()){
         //extractExons(downloadGTF.out)
     }
 }

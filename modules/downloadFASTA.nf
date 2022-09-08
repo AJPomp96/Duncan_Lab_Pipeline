@@ -29,15 +29,16 @@ process downloadFASTA {
     memory '64 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'link'
     
     output:
     path("*.fa")
 
-    script:
-    """
+    shell:
+    '''
     get ${params.fasta}
     if [ -f *.gz ]; then
         gunzip *.gz
     fi
+    '''
 }
