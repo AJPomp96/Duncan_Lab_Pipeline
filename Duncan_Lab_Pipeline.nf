@@ -38,8 +38,8 @@ params.db = "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rl
 
 //Include modules to main pipeline
 include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: params.db)
-include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: params.db)
-include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: params.db)
+include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: params.db, gtf: params.gtf)
+include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: params.db, fasta: params.fasta)
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -89,12 +89,10 @@ workflow preprocess {
     //Detect if gtf file and fasta file exist, if not download fasta and gtf
     if(file("${params.db}*.gtf").isEmpty()){
         downloadGTF()
-        println params.gtf
     }
 
     if(file("${params.db}*.fa").isEmpty()){
         downloadFASTA()
-        println params.fasta
     }
 
     if(file("${params.db}*.ss").isEmpty()){

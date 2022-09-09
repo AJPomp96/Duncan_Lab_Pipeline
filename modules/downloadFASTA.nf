@@ -23,6 +23,7 @@ nextflow.enable.dsl=2
 Configurable variables for process
 */
 params.outdir = "./db"
+params.fasta = ""
 
 process downloadFASTA {
     executor = 'slurm'
@@ -36,7 +37,7 @@ process downloadFASTA {
 
     shell:
     '''
-    get ${params.fasta}
+    wget "!{params.fasta}"
     if [ -f *.gz ]; then
         gunzip *.gz
     fi

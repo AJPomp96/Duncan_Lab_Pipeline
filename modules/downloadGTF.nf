@@ -23,6 +23,7 @@ nextflow.enable.dsl=2
 Configurable variables for process
 */
 params.outdir = "./db"
+params.gtf = ""
 
 process downloadGTF {
     executor = 'slurm'
@@ -36,10 +37,12 @@ process downloadGTF {
 
     shell:
     '''
-    get ${params.gtf}
+    wget "!{params.gtf}"
     if [ -f *.gz ]; then
         gunzip *.gz
     fi
+
+    GTF_FILE=$(ls *.gtf)
 
     #fix Lim2/Gm52993 error
     #Lim2 is obscured by a nonsense mediated decay transcript
