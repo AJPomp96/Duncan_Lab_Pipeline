@@ -39,6 +39,6 @@ process extractSpliceSites {
 
     shell:
     '''
-    hisat2_extract_splice_sites.py ${gtf} > genome.ss
+    hisat2_extract_splice_sites.py !{gtf} > genome.ss
     '''
 }

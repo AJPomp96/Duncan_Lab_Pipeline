@@ -40,6 +40,8 @@ params.db = "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rl
 include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: params.db)
 include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: params.db, gtf: params.gtf)
 include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: params.db, fasta: params.fasta)
+include { extractExons } from './modules/extractExons.nf' addParams(outdir: params.db)
+include { extractSpliceSites } from './modules/extractSpliceSites.nf' addParams(outdir: params.db)
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -59,6 +61,7 @@ if( params.rmrRNA ){
 
 //Only include hisat2 processes if params.aligner is 'hisat2' (default = hisat2)
 if( params.aligner == 'hisat2') {
+    include { makeHisatIndex } from './modules/makeHisatIndex.nf' addParams(outdir: params.db)
     include { hisat2_align } from './modules/hisat2_align.nf'
     include { hisat2_sort } from './modules/hisat2_sort.nf'
 }
@@ -86,20 +89,42 @@ workflow preprocess {
     if(file("${params.db}*.g19.fa").isEmpty()){
         make_rRNA_db()
     }
-    //Detect if gtf file and fasta file exist, if not download fasta and gtf
+    //Detect if gtf file exists, if not, download gtf
     if(file("${params.db}*.gtf").isEmpty()){
         downloadGTF()
     }
-
+    //Detect if fasta file exists, if not, download fasta
     if(file("${params.db}*.fa").isEmpty()){
         downloadFASTA()
     }
 
+    Channel
+        .fromPath( "${params.db}*.gtf" )
+        .set{ gtf }
+    
+    Channel
+        .fromPath( "${params.db}*${params.genome}*.fa" )
+        .set{ fasta }
+
     if(file("${params.db}*.ss").isEmpty()){
-        //extractSpliceSites(downloadGTF.out)
+        extractSpliceSites(gtf)
     }
+    
     if(file("${params.db}*.exon").isEmpty()){
-        //extractExons(downloadGTF.out)
+        extractExons(gtf)
+    }
+
+    Channel
+        .fromPath( "${params.db}*.ss" )
+        .set{ ss }
+    
+    Channel
+        .fromPath( "${params.db}*.exon" )
+        .set{ exon }
+
+    if(file("${params.db}*.ht2").isEmpty()){
+        gtf.concat(fasta, ss, exon).view()
+        //makeHisatIndex()
     }
 }
 

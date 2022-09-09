@@ -39,6 +39,6 @@ process extractExons {
 
     shell:
     '''
-    hisat2_extract_exons.py ${gtf} > genome.exon
+    hisat2_extract_exons.py !{gtf} > genome.exon
     '''
 }

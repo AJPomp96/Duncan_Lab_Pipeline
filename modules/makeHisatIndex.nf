@@ -19,6 +19,28 @@ Enable Nextflow DSL2
 */
 nextflow.enable.dsl=2
 
+/*
+Configurable variables for process
+*/
+params.outdir = "./db"
+
 process makeHisatIndex {
-    
+    executor = 'slurm'
+    memory '256 GB'
+    cpus 8
+
+    publishDir "${params.outdir}", mode: 'link'
+
+    input:
+
+    output:
+    path("*.ht2")
+
+    shell:
+    '''
+    #echo !{gtf}
+    #echo !{fasta}
+    #echo !{ss}
+    #echo !{exon}
+    '''
 }
