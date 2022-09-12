@@ -89,42 +89,54 @@ workflow preprocess {
     if(file("${params.db}*.g19.fa").isEmpty()){
         make_rRNA_db()
     }
+    
     //Detect if gtf file exists, if not, download gtf
     if(file("${params.db}*.gtf").isEmpty()){
         downloadGTF()
+        gtf = downloadGTF.out
+    }else{
+        Channel
+        .fromPath( "${params.db}*.gtf" )
+        .set{ gtf }
     }
     //Detect if fasta file exists, if not, download fasta
     if(file("${params.db}*.fa").isEmpty()){
         downloadFASTA()
-    }
-
-    Channel
-        .fromPath( "${params.db}*.gtf" )
-        .set{ gtf }
-    
-    Channel
+        fasta = downloadFASTA.out
+    }else{
+        Channel
         .fromPath( "${params.db}*${params.genome}*.fa" )
         .set{ fasta }
-    
+    }
+    //Detect if genome.ss exists, if not, extract splice sites from gtf
     if(file("${params.db}*.ss").isEmpty()){
         extractSpliceSites(gtf)
-    }
-    
-    if(file("${params.db}*.exon").isEmpty()){
-        extractExons(gtf)
-    }
-
-    Channel
+        ss = extractSpliceSites.out
+    }else{
+        Channel
         .fromPath( "${params.db}*.ss" )
         .set{ ss }
-    
-    Channel
+    }
+    //Detect if genome.exon exists, if not, extract exons from gtf
+    if(file("${params.db}*.exon").isEmpty()){
+        extractExons(gtf)
+        exon = extractExons.out
+    }else{
+        Channel
         .fromPath( "${params.db}*.exon" )
         .set{ exon }
-
+    }
+    //Detect if hisat indexes exist, if not, make hisat indexes
     if(file("${params.db}*.ht2").isEmpty()){
         makeHisatIndex(gtf.merge(fasta, ss, exon))
     }
+
+    /*
+    //Detect if length file exists, if not, extract lengths
+    if(file("${params.db}*Length_GC.tsv".isEmpty)){
+        //extractLength(gtf.merge(fasta))
+    }
+    */
 }
 
 /*

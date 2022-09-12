@@ -32,7 +32,7 @@ process extractLength {
     publishDir "${params.outdir}", mode: 'link'
     
     input:
-    tuple path(gtf), path(fasta), path(ss), path(exon)
+    tuple path(gtf), path(fasta)
 
     shell:
     '''

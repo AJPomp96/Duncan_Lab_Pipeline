@@ -36,9 +36,11 @@ process makeHisatIndex {
 
     shell:
     '''
-    echo !{gtf}
-    echo !{fasta}
-    echo !{ss}
-    echo !{exon}
+    hisat2-build -f \
+    -p 8 \
+    --ss !{ss} \
+    --exon !{exon} \
+    !{fasta} \
+    !{params.genome}_!{params.ens_rls}
     '''
 }
