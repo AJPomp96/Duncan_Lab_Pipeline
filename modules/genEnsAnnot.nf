@@ -24,21 +24,14 @@ Configurable variables for process
 */
 params.outdir = "./db"
 
-process makeHisatIndex {
+process genEnsAnnot {
     executor = 'slurm'
-    memory '256 GB'
-    cpus 8
+    memory '8 GB'
+    cpus 1
 
-    publishDir "${params.outdir}", mode: 'link'
+    """
+    #!/usr/bin/env Rscript
     
-    input:
-    tuple path(gtf), path(fasta), path(ss), path(exon)
-
-    shell:
-    '''
-    echo !{gtf}
-    echo !{fasta}
-    echo !{ss}
-    echo !{exon}
-    '''
+    .libPaths()
+    """
 }

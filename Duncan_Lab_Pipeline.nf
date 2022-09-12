@@ -105,7 +105,7 @@ workflow preprocess {
     Channel
         .fromPath( "${params.db}*${params.genome}*.fa" )
         .set{ fasta }
-
+    
     if(file("${params.db}*.ss").isEmpty()){
         extractSpliceSites(gtf)
     }
@@ -123,8 +123,7 @@ workflow preprocess {
         .set{ exon }
 
     if(file("${params.db}*.ht2").isEmpty()){
-        gtf.concat(fasta, ss, exon).view()
-        //makeHisatIndex()
+        makeHisatIndex(gtf.merge(fasta, ss, exon))
     }
 }
 

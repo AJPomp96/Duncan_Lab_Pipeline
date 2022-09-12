@@ -24,7 +24,7 @@ Configurable variables for process
 */
 params.outdir = "./db"
 
-process makeHisatIndex {
+process extractLength {
     executor = 'slurm'
     memory '256 GB'
     cpus 8
@@ -36,9 +36,5 @@ process makeHisatIndex {
 
     shell:
     '''
-    echo !{gtf}
-    echo !{fasta}
-    echo !{ss}
-    echo !{exon}
     '''
 }
