@@ -26,15 +26,34 @@ params.outdir = "./db"
 
 process extractLength {
     executor = 'slurm'
-    memory '256 GB'
-    cpus 8
+    memory '32 GB'
+    cpus 2
 
     publishDir "${params.outdir}", mode: 'link'
     
     input:
-    tuple path(gtf), path(fasta)
+    path(gtf)
+
+    output:
+    path("*.tsv")
 
     shell:
     '''
+    #!/usr/bin/env Rscript
+    
+    library(GenomicFeatures)
+
+    #create txdb from gtf file
+    txdb <- makeTxDbFromGFF("!{gtf}", format="gtf")
+    
+    #collect exons per gene id
+    exons.list.per.gene <- exonsBy(txdb,by="gene")
+
+    #for each gene reduce all exons to a set of non overlapping exons, calculate their lengths (widths) and sum them
+    exonic.gene.sizes <- lapply(exons.list.per.gene,function(x){sum(width(reduce(x)))})
+
+    #to see them in table format, unlist them
+    unlist_geneLength <- unlist(exonic.gene.sizes)
+    write.table(unlist_geneLength, "EnsMm_!{params.genome}_!{params.ens_rls}_Length.tsv", quote=FALSE, col.names=FALSE)
     '''
 }

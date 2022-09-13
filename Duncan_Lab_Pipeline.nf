@@ -42,6 +42,8 @@ include { downloadGTF } from './modules/downloadGTF.nf' addParams(outdir: params
 include { downloadFASTA } from './modules/downloadFASTA.nf' addParams(outdir: params.db, fasta: params.fasta)
 include { extractExons } from './modules/extractExons.nf' addParams(outdir: params.db)
 include { extractSpliceSites } from './modules/extractSpliceSites.nf' addParams(outdir: params.db)
+include { extractLength } from './modules/extractLength.nf' addParams(outdir: params.db)
+include { genEnsAnnot } from './modules/genEnsAnnot.nf' addParams(outdir: params.db)
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -131,12 +133,19 @@ workflow preprocess {
         makeHisatIndex(gtf.merge(fasta, ss, exon))
     }
 
-    /*
     //Detect if length file exists, if not, extract lengths
-    if(file("${params.db}*Length_GC.tsv".isEmpty)){
-        //extractLength(gtf.merge(fasta))
+    if(file("${params.db}*Length.tsv").isEmpty()){
+        extractLength(gtf)
+        lengths = extractLength.out
+    }else{
+        Channel
+        .fromPath( "${params.db}*Length.tsv" )
+        .set{ lengths }
     }
-    */
+
+    if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
+        genEnsAnnot(lengths)
+    }
 }
 
 /*

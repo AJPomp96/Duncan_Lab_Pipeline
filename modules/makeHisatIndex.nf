@@ -34,6 +34,9 @@ process makeHisatIndex {
     input:
     tuple path(gtf), path(fasta), path(ss), path(exon)
 
+    output:
+    path("*.ht2")
+
     shell:
     '''
     hisat2-build -f \
