@@ -68,7 +68,7 @@ process genEnsAnnot {
     martdf <- martdf %>% rowwise() %>% mutate(gene_id_version=gsub(paste0(gene_id,"."),"",gene_id_version))
 
     print(paste("Rows in meta table:", nrow(martdf)))
-
+    
     gene_annotations <- inner_join(length_table, martdf, by="gene_id")
 
     print(paste("Rows in annotation table:", nrow(gene_annotations)))
