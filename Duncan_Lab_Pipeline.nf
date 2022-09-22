@@ -44,6 +44,8 @@ include { extractExons } from './modules/extractExons.nf' addParams(outdir: para
 include { extractSpliceSites } from './modules/extractSpliceSites.nf' addParams(outdir: params.db)
 include { extractLength } from './modules/extractLength.nf' addParams(outdir: params.db)
 include { genEnsAnnot } from './modules/genEnsAnnot.nf' addParams(outdir: params.db)
+include { dexSeqPrep } from './modules/dexSeqPrep.nf' addParams(outdir: params.db)
+
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
 include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
@@ -143,6 +145,7 @@ workflow preprocess {
         .set{ lengths }
     }
 
+    //Detect if annotation file exists, if not, generate annotation file
     if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
         genEnsAnnot(lengths)
     }
@@ -218,4 +221,5 @@ Workflow Execution
 */
 workflow {
     preprocess()
+    //trim_filter(reads_ch)
 }

@@ -25,7 +25,7 @@ Define local params
 params.outdir = "./results"
 params.pubdir = "sortmerna"
 params.singleEnd = false
-params.rRNAdb = "/work/ajpompet/01Aug2022_Nextflow_Test/db/rRNA-l19.mus_musculus.fa"
+params.rRNAdb = "${params.db}*.g19.fa"
 
 /*
 Run sortmerna on each read stored within the trim_galore channel
