@@ -211,6 +211,7 @@ workflow alignment {
             hisat2_sort(hisat2_align.out)
             output = hisat2_sort.out
         }
+        //process for making dexseq count files
         if( params.aligner == 'star') {
             //NEEDED: add processes for STAR aligner
         }
