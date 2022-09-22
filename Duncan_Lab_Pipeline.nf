@@ -145,6 +145,10 @@ workflow preprocess {
         .set{ lengths }
     }
 
+    if(file("${params.db}*.gff").isEmpty()){
+        dexSeqPrep(gtf)
+    }
+
     //Detect if annotation file exists, if not, generate annotation file
     if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
         genEnsAnnot(lengths)

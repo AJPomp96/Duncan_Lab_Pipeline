@@ -39,6 +39,6 @@ process dexSeqPrep {
 
     shell:
     '''
-    python3 dexseq_prepare_annotation.py !{gtf} !{params.genome}_!{params.ens_rls}.gff
+    dexseq_prepare_annotation.py !{gtf} !{params.genome}.!{params.ens_rls}.gff
     '''
 }
