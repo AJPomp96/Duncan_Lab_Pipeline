@@ -27,10 +27,10 @@ params.pubdir = "dexseq"
 
 process dexSeqCount {
     executor = 'slurm'
-    memory '32 GB'
+    memory '128 GB'
     cpus 2
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
 
     input:
     tuple val(file_id), file(sam)
@@ -40,6 +40,19 @@ process dexSeqCount {
 
     shell:
     '''
-    dexseq_count.py !{params.db}!{params.genome}!{params.ens_rls}.gff !{sam} !{file_id}_dxsq.txt
+    samtools view \
+	-@ !{task.cpus} \
+	-bS !{sam} > !{file_id}.bam
+
+    samtools sort \
+	-@ !{task.cpus} \
+	-m 12G \
+	-o !{file_id}.sorted.bam \
+    !{file_id}.bam
+
+    dexseq_count.py \
+    !{params.db}!{params.genome}.!{params.ens_rls}.gff \
+    !{sam} \
+    !{file_id}_dxsq.txt
     '''
 }

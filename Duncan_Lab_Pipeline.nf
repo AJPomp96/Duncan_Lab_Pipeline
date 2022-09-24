@@ -32,7 +32,7 @@ params.name = false
 params.forward_stranded = false
 params.reverse_stranded = false
 params.unstranded = false
-params.rmrRNA = true
+params.rmrRNA = false
 params.aligner = 'hisat2'
 params.db = "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/"
 
@@ -51,6 +51,8 @@ include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdi
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
 include { fastqc as ribotrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'ribotrim_fastqc')
 include { trim_galore } from './modules/trim_galore.nf'
+
+include { dexSeqCount } from './modules/dexSeqCount.nf'
 
 //Only include rmRNA processes if user wants ribosomal RNA filtering (default = true)
 if( params.rmrRNA ){
@@ -208,13 +210,14 @@ workflow alignment {
     //Conditional processes depending on aligner chosen (default = hisat2)
         if( params.aligner == 'hisat2') {
             hisat2_align(data)
+            sam = hisat2_align.out
             hisat2_sort(hisat2_align.out)
             output = hisat2_sort.out
         }
-        //process for making dexseq count files
         if( params.aligner == 'star') {
             //NEEDED: add processes for STAR aligner
         }
+        dexSeqCount(sam)
     
     emit:
         output
@@ -226,5 +229,6 @@ Workflow Execution
 */
 workflow {
     preprocess()
-    //trim_filter(reads_ch)
+    trim_filter(reads_ch)
+    alignment(trim_filter.out)
 }

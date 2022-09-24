@@ -35,7 +35,7 @@ process sortMeRNA {
     memory '32 GB'
     cpus 8
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
     
     input:
     tuple val(file_id), file(reads)
