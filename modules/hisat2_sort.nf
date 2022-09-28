@@ -49,7 +49,7 @@ process hisat2_sort {
 	-m 12G \
 	-o ${file_id}.sorted.bam \
     ${file_id}.bam
-
+    
     samtools index ${file_id}.sorted.bam
     """
 }

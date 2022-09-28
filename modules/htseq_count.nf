@@ -30,7 +30,7 @@ process htseq_count {
     memory '32 GB'
     cpus 2
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
 
     input:
     tuple val(file_id), file(bam)
@@ -48,6 +48,6 @@ process htseq_count {
 	-m union \
 	--type exon \
 	${bam} \
-	/work/ajpompet/old_EnsMm_grc39_104/Mus_musculus.GRCm39.104.gtf > ${file_id}_rf_GeneCount.txt
+	${params.db}*.gtf" > ${file_id}_rf_GeneCount.txt
     """
 }

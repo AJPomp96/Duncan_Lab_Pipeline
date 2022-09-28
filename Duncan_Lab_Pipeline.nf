@@ -203,7 +203,7 @@ workflow trim_filter {
 STEP 2: 
 Align reads with specified aligner (STAR or HISAT2)
 */
-workflow alignment {
+workflow alignment_count {
     take: data
 
     main:
@@ -215,9 +215,10 @@ workflow alignment {
             output = hisat2_sort.out
         }
         if( params.aligner == 'star') {
-            //NEEDED: add processes for STAR aligner
+            //TODO: add processes for STAR aligner
         }
         dexSeqCount(sam)
+        htseq_count(hisat2_sort.out)
     
     emit:
         output
@@ -230,5 +231,5 @@ Workflow Execution
 workflow {
     preprocess()
     trim_filter(reads_ch)
-    alignment(trim_filter.out)
+    alignment_count(trim_filter.out)
 }
