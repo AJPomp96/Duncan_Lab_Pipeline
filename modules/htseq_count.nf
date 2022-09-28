@@ -48,6 +48,6 @@ process htseq_count {
 	-m union \
 	--type exon \
 	${bam} \
-	${params.db}*.gtf" > ${file_id}_rf_GeneCount.txt
+	${params.db}*.gtf > ${file_id}_rf_GeneCount.txt
     """
 }
