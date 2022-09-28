@@ -180,15 +180,13 @@ workflow trim_filter {
             if( params.singleEnd ) {
                 sortmerna_fastqc(sortMeRNA.out)
                 ribotrim_fastqc(rn45s_sort.out)
+		output = sortMeRNA.out
             }
             else {
                 repair_fastq(sortMeRNA.out)
                 sortmerna_fastqc(repair_fastq.out)
+		output = repair_fastq.out
             }
-        }
-
-         if( params.rmrRNA ) {
-            output = repair_fastq.out
         }
 
         else {
