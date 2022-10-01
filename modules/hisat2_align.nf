@@ -31,7 +31,7 @@ params.unstranded = false
 
 process hisat2_align {
     executor = 'slurm'
-    memory '128 GB'
+    memory '256 GB'
     cpus 8
 
     publishDir "${params.outdir}/${params.pubdir}"
@@ -61,7 +61,7 @@ process hisat2_align {
     --phred33 \
     --dta \
     --summary-file ${file_id}_AlignStat.txt \
-    -x /work/ajpompet/EnsMm_grc39_104/EnsMm_grc39_104 \
+    -x ${params.db}${params.genome}_${params.ens_rls} \
     -U ${reads} \
 	${rnastrandness} \
     -S ${file_id}.sam
@@ -74,7 +74,7 @@ process hisat2_align {
     --phred33 \
     --dta \
     --summary-file ${file_id}_AlignStat.txt \
-    -x /work/ajpompet/EnsMm_grc39_104/EnsMm_grc39_104 \
+    -x ${params.db}${params.genome}_${params.ens_rls} \
     -1 ${reads[0]} \
     -2 ${reads[1]} \
 	${rnastrandness} \
