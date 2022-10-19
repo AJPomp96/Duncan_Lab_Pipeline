@@ -32,8 +32,9 @@ Run sortmerna on each read stored within the trim_galore channel
 */
 process sortMeRNA {
     executor = 'slurm'
+    queueSize = 3
     memory '32 GB'
-    cpus 8
+    cpus 4
 
     publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
     

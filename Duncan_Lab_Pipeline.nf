@@ -174,12 +174,12 @@ workflow trim_filter {
         //rRNA filter trimmed reads
         if( params.rmrRNA ) {
             sortMeRNA(trim_galore.out)
-            rn45s_align(trim_galore.out)
-            rn45s_sort(rn45s_align.out)
-            //skip repair_fasq process if fastq is single-end
+            //rn45s_align(trim_galore.out)
+            //rn45s_sort(rn45s_align.out)
+            //skip repair_fastq process if fastq is single-end
             if( params.singleEnd ) {
                 sortmerna_fastqc(sortMeRNA.out)
-                ribotrim_fastqc(rn45s_sort.out)
+                //ribotrim_fastqc(rn45s_sort.out)
 		output = sortMeRNA.out
             }
             else {
