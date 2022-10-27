@@ -29,6 +29,7 @@ params.pubdir = "fastqc"
 Run fastqc on fastq files
 */
 process fastqc {
+    maxForks 3
     executor = 'slurm'
     memory '8 GB'
     cpus 2

@@ -30,6 +30,7 @@ params.singleEnd = false
 Run trim_galore on each read stored within the reads_ch channel
 */
 process trim_galore {
+    maxForks 3
     executor = 'slurm'
     memory '8 GB'
     cpus 8

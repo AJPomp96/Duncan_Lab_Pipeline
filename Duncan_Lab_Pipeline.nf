@@ -75,86 +75,84 @@ include { htseq_count } from './modules/htseq_count.nf'
 include { multiqc } from './modules/multiqc.nf'
 
 /*
-Create channel to auto detect paired end data. Specifiy --singleEnd if your fastq is in single-end format
-*/
-Channel
-    .fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2)
-    .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
-    .set{ reads_ch }
-
-/*
 PREPROCESSING: 
 Download Fasta, Download GTF, Build HISAT2/STAR indexes, Build BED file,
 */
 workflow preprocess {
-    //Generate folder where gtf file, fasta file, rRNA fasta, and aligner files will be contained
-    if(file(params.db).isEmpty()){
-        file(params.db).mkdir()
-    }
-    //Generate rRNA db for specified species (default = mus musculus)
-    if(file("${params.db}*.g19.fa").isEmpty()){
-        make_rRNA_db()
-    }
-    
-    //Detect if gtf file exists, if not, download gtf
-    if(file("${params.db}*.gtf").isEmpty()){
-        downloadGTF()
-        gtf = downloadGTF.out
-    }else{
-        Channel
-        .fromPath( "${params.db}*.gtf" )
-        .set{ gtf }
-    }
-    //Detect if fasta file exists, if not, download fasta
-    if(file("${params.db}*.fa").isEmpty()){
-        downloadFASTA()
-        fasta = downloadFASTA.out
-    }else{
-        Channel
-        .fromPath( "${params.db}*${params.genome}*.fa" )
-        .set{ fasta }
-    }
-    //Detect if genome.ss exists, if not, extract splice sites from gtf
-    if(file("${params.db}*.ss").isEmpty()){
-        extractSpliceSites(gtf)
-        ss = extractSpliceSites.out
-    }else{
-        Channel
-        .fromPath( "${params.db}*.ss" )
-        .set{ ss }
-    }
-    //Detect if genome.exon exists, if not, extract exons from gtf
-    if(file("${params.db}*.exon").isEmpty()){
-        extractExons(gtf)
-        exon = extractExons.out
-    }else{
-        Channel
-        .fromPath( "${params.db}*.exon" )
-        .set{ exon }
-    }
-    //Detect if hisat indexes exist, if not, make hisat indexes
-    if(file("${params.db}*.ht2").isEmpty()){
-        makeHisatIndex(gtf.merge(fasta, ss, exon))
-    }
 
-    //Detect if length file exists, if not, extract lengths
-    if(file("${params.db}*Length.tsv").isEmpty()){
-        extractLength(gtf)
-        lengths = extractLength.out
-    }else{
-        Channel
-        .fromPath( "${params.db}*Length.tsv" )
-        .set{ lengths }
-    }
+    main:
+        //Generate folder where gtf file, fasta file, rRNA fasta, and aligner files will be contained
+        if(file(params.db).isEmpty()){
+            file(params.db).mkdir()
+        }
+        //Generate rRNA db for specified species (default = mus musculus)
+        if(file("${params.db}*.g19.fa").isEmpty()){
+            make_rRNA_db()
+        }
+        
+        //Detect if gtf file exists, if not, download gtf
+        if(file("${params.db}*.gtf").isEmpty()){
+            downloadGTF()
+            gtf = downloadGTF.out
+        }else{
+            Channel
+            .fromPath( "${params.db}*.gtf" )
+            .set{ gtf }
+        }
+        //Detect if fasta file exists, if not, download fasta
+        if(file("${params.db}*.fa").isEmpty()){
+            downloadFASTA()
+            fasta = downloadFASTA.out
+        }else{
+            Channel
+            .fromPath( "${params.db}*${params.genome}*.fa" )
+            .set{ fasta }
+        }
+        //Detect if genome.ss exists, if not, extract splice sites from gtf
+        if(file("${params.db}*.ss").isEmpty()){
+            extractSpliceSites(gtf)
+            ss = extractSpliceSites.out
+        }else{
+            Channel
+            .fromPath( "${params.db}*.ss" )
+            .set{ ss }
+        }
+        //Detect if genome.exon exists, if not, extract exons from gtf
+        if(file("${params.db}*.exon").isEmpty()){
+            extractExons(gtf)
+            exon = extractExons.out
+        }else{
+            Channel
+            .fromPath( "${params.db}*.exon" )
+            .set{ exon }
+        }
+        //Detect if hisat indexes exist, if not, make hisat indexes
+        if(file("${params.db}*.ht2").isEmpty()){
+            makeHisatIndex(gtf.merge(fasta, ss, exon))
+        }
 
-    if(file("${params.db}*.gff").isEmpty()){
-        dexSeqPrep(gtf)
-    }
+        //Detect if length file exists, if not, extract lengths
+        if(file("${params.db}*Length.tsv").isEmpty()){
+            extractLength(gtf)
+            lengths = extractLength.out
+        }else{
+            Channel
+            .fromPath( "${params.db}*Length.tsv" )
+            .set{ lengths }
+        }
 
-    //Detect if annotation file exists, if not, generate annotation file
-    if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
-        genEnsAnnot(lengths)
-    }
+        if(file("${params.db}*.gff").isEmpty()){
+            dexSeqPrep(gtf)
+        }
+
+        //Detect if annotation file exists, if not, generate annotation file
+        if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
+            genEnsAnnot(lengths)
+            output = genEnsAnnot.out
+        }
+
+    emit:
+        output
 }
 
 /*
@@ -162,12 +160,21 @@ STEP 1:
 Trim reads with Trim Galore, Filter reads for rRNA, Perform FastQC on reads before and after trim/filter
 */
 workflow trim_filter {
-    take: data
+
+    take: 
+    data
 
     main:
+
+    //Create channel to auto detect paired end data. Specifiy --singleEnd if your fastq is in single-end format
+    Channel
+        .fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2)
+        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
+        .set{ reads_ch }
+
         //Perform fastqc on pretrimmed reads, trim reads, and perform fastqc on trimmed reads
-        pretrim_fastqc(data)
-        trim_galore(data)
+        pretrim_fastqc(reads_ch)
+        trim_galore(reads_ch)
         posttrim_fastqc(trim_galore.out)
 
         //Steps if user specifies for samples to have ribosomal RNA filtering (default = true)
@@ -228,6 +235,6 @@ Workflow Execution
 */
 workflow {
     preprocess()
-    trim_filter(reads_ch)
+    trim_filter(preprocess.out)
     alignment_count(trim_filter.out)
 }

@@ -31,12 +31,15 @@ params.rRNAdb = "${params.db}*.g19.fa"
 Run sortmerna on each read stored within the trim_galore channel
 */
 process sortMeRNA {
+    maxForks 3
     executor = 'slurm'
-    queueSize = 3
     memory '32 GB'
     cpus 4
 
     publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
+
+    when:
+    !file("${params.db}*.g19.fa").isEmpty()
     
     input:
     tuple val(file_id), file(reads)

@@ -36,6 +36,9 @@ process hisat2_align {
 
     publishDir "${params.outdir}/${params.pubdir}"
 
+    when:
+    !file("${params.db}${params.genome}_${params.ens_rls}").isEmpty()
+
     input:
     tuple val(file_id), file(reads)
 
