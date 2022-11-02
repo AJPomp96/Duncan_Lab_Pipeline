@@ -43,6 +43,7 @@ process sortMeRNA {
     
     input:
     tuple val(file_id), file(reads)
+    file(rRNAdb)
 
     output:
     tuple val(file_id), path("*rmrRNA*.fq.gz")
@@ -52,7 +53,7 @@ process sortMeRNA {
     """
     echo $params.singleEnd
     
-    sortmerna --ref ${params.rRNAdb} \
+    sortmerna --ref ${rRNAdb} \
 	--reads $reads \
 	--fastx \
     --workdir . \
@@ -64,7 +65,7 @@ process sortMeRNA {
     """
     echo $params.singleEnd
 
-    sortmerna --ref ${params.rRNAdb} \
+    sortmerna --ref ${rRNAdb} \
     --reads ${reads[0]} --reads ${reads[1]} \
     --fastx --pair_out --out2 \
     --workdir . \
