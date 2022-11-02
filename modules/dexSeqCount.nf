@@ -34,6 +34,7 @@ process dexSeqCount {
 
     input:
     tuple val(file_id), file(sam)
+    file(gff)
 
     output:
     tuple val(file_id), path("*_dxsq.txt")
@@ -51,7 +52,7 @@ process dexSeqCount {
     !{file_id}.bam
 
     dexseq_count.py \
-    !{params.db}!{params.genome}.!{params.ens_rls}.gff \
+    !{gff} \
     !{sam} \
     !{file_id}_dxsq.txt
     '''

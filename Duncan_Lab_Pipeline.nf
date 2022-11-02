@@ -74,7 +74,7 @@ if( params.aligner == 'hisat2') {
 include { htseq_count } from './modules/htseq_count.nf'
 include { multiqc } from './modules/multiqc.nf'
 
-workflow trim_filter {
+workflow trim_filter_align_count {
 
     main:
     /*
@@ -154,6 +154,11 @@ workflow trim_filter {
         .set{ lengths }
     }
 
+    //Detect if annotation file exists, if not, generate annotation file
+    if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
+        genEnsAnnot(lengths)
+    }
+
     //Detect if gff file exists, if not run dexseq prep to create gff file
     if(file("${params.db}*.gff").isEmpty()){
         dexSeqPrep(gtf)
@@ -162,12 +167,7 @@ workflow trim_filter {
         Channel
         .fromPath( "${params.db}*.gff" )
         .set{ gff }
-    }
-
-    //Detect if annotation file exists, if not, generate annotation file
-    if(file("${params.db}Mouse_Gene_Annotations.csv").isEmpty()){
-        genEnsAnnot(lengths)
-    }
+    }    
 
     /*
     TRIM_FILTER WORKFLOW:
@@ -193,12 +193,12 @@ workflow trim_filter {
             //skip repair_fastq process if fastq is single-end
             if( params.singleEnd ) {
                 sortmerna_fastqc(sortMeRNA.out)
-		        output = sortMeRNA.out
+		        filtered_fastq = sortMeRNA.out
             }
             else {
                 repair_fastq(sortMeRNA.out)
                 sortmerna_fastqc(repair_fastq.out)
-		        output = repair_fastq.out
+		        filtered_fastq = repair_fastq.out
             }
         }
 
@@ -206,21 +206,16 @@ workflow trim_filter {
             output = trim_galore.out
         }
         
-    emit:
-       output
-}
 
-/*
-STEP 2: 
-Align reads with specified aligner (STAR or HISAT2)
-*/
-workflow alignment_count {
-    take: data
-    
-    main:
-    //Conditional processes depending on aligner chosen (default = hisat2)
+        /*
+        ALIGN_COUNT WORKFLOW:
+        Trim reads with Trim Galore, 
+        Filter reads for rRNA,
+        Perform FastQC on reads before and after trim/filter
+        */
+        //Conditional processes depending on aligner chosen (default = hisat2)
         if( params.aligner == 'hisat2') {
-            hisat2_align(data)
+            hisat2_align(filtered_fastq)
             sam = hisat2_align.out
             hisat2_sort(hisat2_align.out)
             output = hisat2_sort.out
@@ -228,11 +223,8 @@ workflow alignment_count {
         if( params.aligner == 'star') {
             //TODO: add processes for STAR aligner
         }
-        dexSeqCount(sam)
+        dexSeqCount(sam, gff)
         htseq_count(hisat2_sort.out)
-    
-    emit:
-        output
 }
 
 /*
@@ -240,6 +232,5 @@ MAIN:
 Workflow Execution
 */
 workflow {
-    trim_filter()
-    alignment_count(trim_filter.out)
+    main()
 }

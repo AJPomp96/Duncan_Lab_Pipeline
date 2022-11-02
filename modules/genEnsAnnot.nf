@@ -25,6 +25,7 @@ Configurable variables for process
 params.outdir = "./db"
 
 process genEnsAnnot {
+
     executor = 'slurm'
     memory '32 GB'
     cpus 2
@@ -44,7 +45,7 @@ process genEnsAnnot {
     library(tidyverse)
     library(biomaRt)
     library(httr)
-
+    
     new_config <- httr::config(ssl_verifypeer = FALSE)
     httr::set_config(new_config, override = FALSE)
 
