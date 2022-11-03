@@ -163,7 +163,7 @@ workflow trim_filter_align_count {
     if(file("${params.db}*.gff").isEmpty()){
         dexSeqPrep(gtf)
         gff = dexSeqPrep.out
-    }{
+    }else{
         Channel
         .fromPath( "${params.db}*.gff" )
         .set{ gff }
@@ -232,5 +232,5 @@ MAIN:
 Workflow Execution
 */
 workflow {
-    main()
+    trim_filter_align_count()
 }
