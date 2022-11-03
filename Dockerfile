@@ -5,7 +5,8 @@ FROM bioconductor/bioconductor_docker:devel
 RUN apt-get update
 
 # Install required Bioconductor package
-RUN R -e 'BiocManager::install("biomaRt", "GenomicFeatures")'
+RUN R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXseq"))'
+
 #Install required R package
 RUN Rscript -e 'install.packages("tidyverse")'
 

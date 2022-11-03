@@ -10,3 +10,4 @@
 !Duncan_Lab_Pipeline.nf
 !README.md
 !Dockerfile
+!.dockerignore
