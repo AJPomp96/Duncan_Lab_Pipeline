@@ -7,4 +7,4 @@ mkdir -p slurm-out
 
 rm -rf work/; rm .nextflow.log*; rm -rf results/
 find ./slurm-out/ -type f -not -name "*-${SLURM_JOBID}.out" -delete
-nextflow run Duncan_Lab_Pipeline --genome 'GRCm39' --rmrRNA
+nextflow run Duncan_Lab_Pipeline.nf --genome 'GRCm39' --rmrRNA
