@@ -31,7 +31,7 @@ process dexSeqPrep {
     memory '32 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'link'
+    publishDir "${params.outdir}", mode: 'copy'
     
     input:
     path(gtf)

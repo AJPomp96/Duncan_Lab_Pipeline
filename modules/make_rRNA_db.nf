@@ -27,14 +27,16 @@ params.outdir = "./db"
 params.species = "mus_musculus"
 
 process make_rRNA_db{
-    executor = 'slurm'
+    container 'duncan_lab'
+    executor 'slurm'
+    clusterOptions '--partition=docker --account=docker'
     memory '64 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'link'
+    publishDir "${params.outdir}", mode: 'copy'
 
     output:
-    path("*.g19.fa")
+    file("*.g19.fa")
 
     shell:
     '''
@@ -63,7 +65,7 @@ process make_rRNA_db{
         > rRNA.!{params.species}.fa
     
     #Remove sequences less than 19bp (uses reformat.sh from BBMap suite) (necessary for sortmerna process)
-    reformat.sh \
+    /bbmap/reformat.sh \
         in=rRNA.!{params.species}.fa \
         out=rRNA.!{params.species}.g19.fa \
         minlength=19
