@@ -30,7 +30,7 @@ process downloadGTF {
     memory '64 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'link'
+    publishDir "${params.outdir}", mode: 'copy'
     
     output:
     path("*.gtf")

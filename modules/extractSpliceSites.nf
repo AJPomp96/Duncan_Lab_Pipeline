@@ -29,7 +29,7 @@ process extractSpliceSites {
     memory '64 GB'
     cpus 2
 
-    publishDir "${params.outdir}", mode: 'link'
+    publishDir "${params.outdir}", mode: 'copy'
 
     input:
     file(gtf)

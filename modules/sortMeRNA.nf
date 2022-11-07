@@ -36,7 +36,7 @@ process sortMeRNA {
     memory '32 GB'
     cpus 4
 
-    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     when:
     !file("${params.db}*.g19.fa").isEmpty()

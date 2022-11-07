@@ -25,11 +25,13 @@ params.outdir = "./results"
 params.pubdir = "repair_fastq"
 
 process repair_fastq {
+    container 'duncan_lab'
     executor = 'slurm'
+    clusterOptions '--partition=docker --account=docker'
     memory '32 GB'
     cpus 2
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(reads)

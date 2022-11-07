@@ -34,7 +34,7 @@ process hisat2_align {
     memory '256 GB'
     cpus 8
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     when:
     !file("${params.db}${params.genome}_${params.ens_rls}").isEmpty()

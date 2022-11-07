@@ -31,7 +31,7 @@ process rn45s_align {
     memory '128 GB'
     cpus 8
 
-	publishDir "${params.outdir}/${params.pubdir}"
+	publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(reads)

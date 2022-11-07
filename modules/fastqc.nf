@@ -34,7 +34,7 @@ process fastqc {
     memory '8 GB'
     cpus 2
     
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(reads)

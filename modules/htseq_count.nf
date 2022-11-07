@@ -30,7 +30,7 @@ process htseq_count {
     memory '32 GB'
     cpus 2
 
-    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(bam)

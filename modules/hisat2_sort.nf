@@ -30,7 +30,7 @@ process hisat2_sort {
     memory '96 GB'
     cpus 8
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(sam)

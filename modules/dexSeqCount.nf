@@ -26,11 +26,13 @@ params.outdir = "./results"
 params.pubdir = "dexseq"
 
 process dexSeqCount {
+    container 'duncan_lab'
     executor = 'slurm'
+    clusterOptions '--partition=docker --account=docker'
     memory '128 GB'
     cpus 2
 
-    publishDir "${params.outdir}/${params.pubdir}", mode: 'link'
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
     tuple val(file_id), file(sam)

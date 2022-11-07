@@ -30,7 +30,7 @@ process multiqc {
     memory '32 GB'
     cpus 8
 
-    publishDir "${params.outdir}/${params.pubdir}"
+    publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
     
     input:
     file('fastqc/*')

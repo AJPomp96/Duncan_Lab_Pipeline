@@ -29,7 +29,7 @@ process makeHisatIndex {
     memory '256 GB'
     cpus 8
 
-    publishDir "${params.outdir}", mode: 'link'
+    publishDir "${params.outdir}", mode: 'copy'
     
     input:
     tuple path(gtf), path(fasta), path(ss), path(exon)

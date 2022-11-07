@@ -35,7 +35,7 @@ process trim_galore {
     memory '8 GB'
     cpus 8
 
-    publishDir "${params.outdir}/trim_galore"
+    publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
     input:
     tuple val(file_id), file(reads)
