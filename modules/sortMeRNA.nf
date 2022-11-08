@@ -37,13 +37,9 @@ process sortMeRNA {
     cpus 4
 
     publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
-
-    when:
-    !file("${params.db}*.g19.fa").isEmpty()
     
     input:
-    tuple val(file_id), file(reads)
-    file(rRNAdb)
+    tuple val(file_id), file(reads), file(rRNAdb)
 
     output:
     tuple val(file_id), path("*rmrRNA*.fq.gz")

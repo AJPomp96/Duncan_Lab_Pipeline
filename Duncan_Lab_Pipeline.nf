@@ -74,7 +74,7 @@ if( params.aligner == 'hisat2') {
 include { htseq_count } from './modules/htseq_count.nf'
 include { multiqc } from './modules/multiqc.nf'
 
-workflow trim_filter_align_count {
+workflow DLP {
 
     main:
     /*
@@ -189,7 +189,7 @@ workflow trim_filter_align_count {
         //Steps if user specifies for samples to have ribosomal RNA filtering (default = true)
         //rRNA filter trimmed reads
         if( params.rmrRNA ) {
-            sortMeRNA(trim_galore.out, rRNAdb)
+            sortMeRNA(trim_galore.out.combine(rRNAdb))
             //skip repair_fastq process if fastq is single-end
             if( params.singleEnd ) {
                 sortmerna_fastqc(sortMeRNA.out)
@@ -232,5 +232,5 @@ MAIN:
 Workflow Execution
 */
 workflow {
-    trim_filter_align_count()
+    DLP()
 }
