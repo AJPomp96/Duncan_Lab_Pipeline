@@ -36,11 +36,8 @@ process hisat2_align {
 
     publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
-    when:
-    !file("${params.db}${params.genome}_${params.ens_rls}").isEmpty()
-
     input:
-    tuple val(file_id), file(reads)
+    tuple val(file_id), file(reads), val(ht2_base)
 
     output:
     tuple val(file_id), file("*.sam")
@@ -64,7 +61,7 @@ process hisat2_align {
     --phred33 \
     --dta \
     --summary-file ${file_id}_AlignStat.txt \
-    -x ${params.db}${params.genome}_${params.ens_rls} \
+    -x ${ht2_base} \
     -U ${reads} \
 	${rnastrandness} \
     -S ${file_id}.sam
@@ -77,7 +74,7 @@ process hisat2_align {
     --phred33 \
     --dta \
     --summary-file ${file_id}_AlignStat.txt \
-    -x ${params.db}${params.genome}_${params.ens_rls} \
+    -x ${ht2_base} \
     -1 ${reads[0]} \
     -2 ${reads[1]} \
 	${rnastrandness} \

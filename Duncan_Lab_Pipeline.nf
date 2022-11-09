@@ -107,16 +107,20 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.gtf" )
         .set{ gtf }
+
+        gtf.view()
     }
 
     //Detect if fasta file exists, if not, download fasta
-    if(file("${params.db}*.fa").isEmpty()){
+    if(file("${params.db}*primary_assembly.fa").isEmpty()){
         downloadFASTA()
         fasta = downloadFASTA.out
     }else{
         Channel
         .fromPath( "${params.db}*${params.genome}*.fa" )
         .set{ fasta }
+
+        fasta.view()
     }
 
     //Detect if genome.ss exists, if not, extract splice sites from gtf
@@ -127,6 +131,8 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.ss" )
         .set{ ss }
+
+        ss.view()
     }
 
     //Detect if genome.exon exists, if not, extract exons from gtf
@@ -137,11 +143,20 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.exon" )
         .set{ exon }
+
+        exon.view()
     }
 
     //Detect if hisat indexes exist, if not, make hisat indexes
     if(file("${params.db}*.ht2").isEmpty()){
         makeHisatIndex(gtf.merge(fasta, ss, exon))
+        ht2_base = makeHisatIndex.out.ht2_base
+
+        ht2_base.view()
+    }else{
+        ht2_base = Channel.from("${params.db}${params.genome}_${params.ens_rls}")
+
+        ht2_base.view()
     }
 
     //Detect if length file exists, if not, extract lengths
@@ -177,54 +192,54 @@ workflow DLP {
     */
     //Create channel to auto detect paired end data. Specifiy --singleEnd if your fastq is in single-end format
     Channel
-        .fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2)
-        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
-        .set{ reads_ch }
+    .fromFilePairs(params.reads, size: params.singleEnd ? 1 : 2)
+    .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
+    .set{ reads_ch }
 
-        //Perform fastqc on pretrimmed reads, trim reads, and perform fastqc on trimmed reads
-        pretrim_fastqc(reads_ch)
-        trim_galore(reads_ch)
-        posttrim_fastqc(trim_galore.out)
+    //Perform fastqc on pretrimmed reads, trim reads, and perform fastqc on trimmed reads
+    pretrim_fastqc(reads_ch)
+    trim_galore(reads_ch)
+    posttrim_fastqc(trim_galore.out)
 
-        //Steps if user specifies for samples to have ribosomal RNA filtering (default = true)
-        //rRNA filter trimmed reads
-        if( params.rmrRNA ) {
-            sortMeRNA(trim_galore.out.combine(rRNAdb))
-            //skip repair_fastq process if fastq is single-end
-            if( params.singleEnd ) {
-                sortmerna_fastqc(sortMeRNA.out)
-		        filtered_fastq = sortMeRNA.out
-            }
-            else {
-                repair_fastq(sortMeRNA.out)
-                sortmerna_fastqc(repair_fastq.out)
-		        filtered_fastq = repair_fastq.out
-            }
+    //Steps if user specifies for samples to have ribosomal RNA filtering (default = true)
+    //rRNA filter trimmed reads
+    if( params.rmrRNA ) {
+        sortMeRNA(trim_galore.out.combine(rRNAdb))
+        //skip repair_fastq process if fastq is single-end
+        if( params.singleEnd ) {
+            sortmerna_fastqc(sortMeRNA.out)
+            filtered_fastq = sortMeRNA.out
         }
-
         else {
-            output = trim_galore.out
+            repair_fastq(sortMeRNA.out)
+            sortmerna_fastqc(repair_fastq.out)
+            filtered_fastq = repair_fastq.out
         }
+    }
+
+    else {
+        filtered_fastq = trim_galore.out
+    }
         
 
-        /*
-        ALIGN_COUNT WORKFLOW:
-        Trim reads with Trim Galore, 
-        Filter reads for rRNA,
-        Perform FastQC on reads before and after trim/filter
-        */
-        //Conditional processes depending on aligner chosen (default = hisat2)
-        if( params.aligner == 'hisat2') {
-            hisat2_align(filtered_fastq)
-            sam = hisat2_align.out
-            hisat2_sort(hisat2_align.out)
-            output = hisat2_sort.out
-        }
-        if( params.aligner == 'star') {
-            //TODO: add processes for STAR aligner
-        }
-        dexSeqCount(sam, gff)
-        htseq_count(hisat2_sort.out)
+    /*
+    ALIGN_COUNT WORKFLOW:
+    Trim reads with Trim Galore, 
+    Filter reads for rRNA,
+    Perform FastQC on reads before and after trim/filter
+    */
+    //Conditional processes depending on aligner chosen (default = hisat2)
+    if( params.aligner == 'hisat2') {
+        hisat2_align(filtered_fastq.combine(ht2_base))
+        sam = hisat2_align.out
+        hisat2_sort(hisat2_align.out)
+        output = hisat2_sort.out
+    }
+    if( params.aligner == 'star') {
+        //TODO: add processes for STAR aligner
+    }
+    dexSeqCount(sam, gff)
+    htseq_count(hisat2_sort.out)
 }
 
 /*
