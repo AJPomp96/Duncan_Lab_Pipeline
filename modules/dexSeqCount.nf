@@ -43,11 +43,11 @@ process dexSeqCount {
 
     shell:
     '''
-    samtools view \
+    samtools-1.9/samtools view \
 	-@ !{task.cpus} \
 	-bS !{sam} > !{file_id}.bam
 
-    samtools sort \
+    samtools-1.9/samtools sort \
 	-@ !{task.cpus} \
 	-m 12G \
 	-o !{file_id}.sorted.bam \
