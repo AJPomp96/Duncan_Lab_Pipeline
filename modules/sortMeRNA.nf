@@ -54,7 +54,7 @@ process sortMeRNA {
 	--fastx \
     --workdir . \
 	--aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
-	--threads 20
+	-a 32
     """
 
     else 
@@ -66,6 +66,6 @@ process sortMeRNA {
     --fastx --pair_out --out2 \
     --workdir . \
     --aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
-    --threads 20
+    -threads 32
     """
 }

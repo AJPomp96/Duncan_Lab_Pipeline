@@ -238,7 +238,7 @@ workflow DLP {
     if( params.aligner == 'star') {
         //TODO: add processes for STAR aligner
     }
-    dexSeqCount(sam, gff)
+    dexSeqCount(sam.combine(gff))
     htseq_count(hisat2_sort.out)
 }
 

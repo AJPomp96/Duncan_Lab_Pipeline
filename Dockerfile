@@ -1,4 +1,4 @@
-# Docker inheritance
+ # Docker inheritance
 FROM bioconductor/bioconductor_docker:devel
 
 #define bbtools version
@@ -41,7 +41,7 @@ RUN Rscript -e 'install.packages("tidyverse")'
 ENV PATH="${PATH}:/usr/local/lib/R/site-library/DEXSeq/python_scripts"
 
 #add samtools to the path
-ENV PATH=${PATH}:/usr/src/samtools-1.9
+ENV PATH=/samtools-1.9:${PATH}
 
 #add bbmap to the path
 ENV PATH="${PATH}:/bbmap"
