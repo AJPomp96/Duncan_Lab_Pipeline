@@ -35,7 +35,7 @@ process makeHisatIndex {
     tuple path(gtf), path(fasta), path(ss), path(exon)
 
     output:
-    file("*.ht2"), emit: ht2
+    path("*.ht2"), emit: ht2
     val("${params.outdir}${params.genome}_${params.ens_rls}"), emit: ht2_base
 
     shell:
