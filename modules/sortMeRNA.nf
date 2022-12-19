@@ -42,7 +42,7 @@ process sortMeRNA {
     tuple val(file_id), file(reads), file(rRNAdb)
 
     output:
-    tuple val(file_id), path("*rmrRNA*.fq.gz")
+    tuple val(file_id), path("*rmrRNA*.fq.gz"), path("*.log")
 
     script:
     if( params.singleEnd )
@@ -50,11 +50,12 @@ process sortMeRNA {
     echo $params.singleEnd
     
     sortmerna --ref ${rRNAdb} \
-	--reads $reads \
-	--fastx \
+    --reads $reads \
+    --fastx \
     --workdir . \
-	--aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
-	-a 32
+    --aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
+    --threads 32 \
+    --log
     """
 
     else 
@@ -66,6 +67,7 @@ process sortMeRNA {
     --fastx --paired_out --out2 \
     --workdir . \
     --aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
-    -threads 32
+    --threads 32 \
+    --log
     """
 }
