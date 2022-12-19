@@ -12,3 +12,4 @@
 !Dockerfile
 !.dockerignore
 !nextflow.sh
+!multiqc_config.yaml
