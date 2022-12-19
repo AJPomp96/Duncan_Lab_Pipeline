@@ -41,7 +41,7 @@ process trim_galore {
     tuple val(file_id), file(reads)
 
     output:
-    tuple val(file_id), path("*.fq.gz")
+    tuple val(file_id), path("*.fq.gz"), path("*trimming_report.txt")
 
     script:
     if ( params.singleEnd )
