@@ -63,7 +63,7 @@ process sortMeRNA {
 
     sortmerna --ref ${rRNAdb} \
     --reads ${reads[0]} --reads ${reads[1]} \
-    --fastx --pair_out --out2 \
+    --fastx --paired_out --out2 \
     --workdir . \
     --aligned ${file_id}_rRNA --other ${file_id}_rmrRNA \
     -threads 32
