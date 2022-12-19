@@ -40,6 +40,6 @@ process multiqc {
 
     script:
     """
-    multiqc fastqc/ -m fastqc
+    multiqc results/
     """
 }
