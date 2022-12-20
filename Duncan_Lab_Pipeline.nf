@@ -94,7 +94,8 @@ workflow DLP {
     if(file("${params.db}*.g19.fa").isEmpty()){
         make_rRNA_db()
         rRNAdb = make_rRNA_db.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*.g19.fa" )
         .set{ rRNAdb }
@@ -104,7 +105,8 @@ workflow DLP {
     if(file("${params.db}*.gtf").isEmpty()){
         downloadGTF()
         gtf = downloadGTF.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*.gtf" )
         .set{ gtf }
@@ -116,7 +118,8 @@ workflow DLP {
     if(file("${params.db}*primary_assembly.fa").isEmpty()){
         downloadFASTA()
         fasta = downloadFASTA.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*${params.genome}*.fa" )
         .set{ fasta }
@@ -128,7 +131,8 @@ workflow DLP {
     if(file("${params.db}*.ss").isEmpty()){
         extractSpliceSites(gtf)
         ss = extractSpliceSites.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*.ss" )
         .set{ ss }
@@ -140,7 +144,8 @@ workflow DLP {
     if(file("${params.db}*.exon").isEmpty()){
         extractExons(gtf)
         exon = extractExons.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*.exon" )
         .set{ exon }
@@ -154,9 +159,9 @@ workflow DLP {
         ht2_base = makeHisatIndex.out.ht2_base
 
         ht2_base.view()
-    }else{
+    }
+    else{
         ht2_base = Channel.from("${params.db}${params.genome}_${params.ens_rls}")
-
         ht2_base.view()
     }
 
@@ -164,7 +169,8 @@ workflow DLP {
     if(file("${params.db}*Length.tsv").isEmpty()){
         extractLength(gtf)
         lengths = extractLength.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*Length.tsv" )
         .set{ lengths }
@@ -179,7 +185,8 @@ workflow DLP {
     if(file("${params.db}*.gff").isEmpty()){
         dexSeqPrep(gtf)
         gff = dexSeqPrep.out
-    }else{
+    }
+    else{
         Channel
         .fromPath( "${params.db}*.gff" )
         .set{ gff }
