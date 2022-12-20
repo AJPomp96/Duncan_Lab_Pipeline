@@ -110,8 +110,6 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.gtf" )
         .set{ gtf }
-
-        gtf.view()
     }
 
     //Detect if fasta file exists, if not, download fasta
@@ -123,8 +121,6 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*${params.genome}*.fa" )
         .set{ fasta }
-
-        fasta.view()
     }
 
     //Detect if genome.ss exists, if not, extract splice sites from gtf
@@ -136,8 +132,6 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.ss" )
         .set{ ss }
-
-        ss.view()
     }
 
     //Detect if genome.exon exists, if not, extract exons from gtf
@@ -149,16 +143,12 @@ workflow DLP {
         Channel
         .fromPath( "${params.db}*.exon" )
         .set{ exon }
-
-        exon.view()
     }
 
     //Detect if hisat indexes exist, if not, make hisat indexes
     if(file("${params.db}*.ht2").isEmpty()){
         makeHisatIndex(gtf.merge(fasta, ss, exon))
         ht2_base = makeHisatIndex.out.ht2_base
-
-        ht2_base.view()
     }
     else{
         ht2_base = Channel.from("${params.db}${params.genome}_${params.ens_rls}")
@@ -250,11 +240,15 @@ workflow DLP {
     htseq_count(hisat2_sort.out)
 
     /*
-    ALIGN_COUNT WORKFLOW:
-    Trim reads with Trim Galore, 
-    Filter reads for rRNA,
-    Perform FastQC on reads before and after trim/filter
+    POST_PROCESS WORKFLOW:
+    MultiQC on PreTrim_FastQC, Trimgalore_Report, 
+    PostTrim_FastQC, SortMeRNA_Report, PostSortMeRNA_FastQC,
+    HiSAT2_Report, HTSeq_Report
     */
+
+    //combine all output files necessary for multiqc report into one channel
+    multiqc_input = pretrim_fastqc.out.combine(trim_galore.out.trimming_report, postrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, htseq_count.out)
+    multiqc_input.view()
 }
 
 /*
