@@ -37,10 +37,11 @@ process hisat2_align {
     publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
 
     input:
-    tuple val(file_id), file(reads), val(ht2_base)
+    tuple val(file_id), path(reads), val(ht2_base)
 
     output:
-    tuple val(file_id), file("*.sam")
+    tuple val(file_id), path("*.sam")
+    path("*_align_report.txt"), emit: align_report
 
     script:
     /*
@@ -60,7 +61,7 @@ process hisat2_align {
     --verbose \
     --phred33 \
     --dta \
-    --summary-file ${file_id}_AlignStat.txt \
+    --summary-file ${file_id}_align_report.txt \
     -x ${ht2_base} \
     -U ${reads} \
 	${rnastrandness} \
@@ -73,7 +74,7 @@ process hisat2_align {
     --verbose \
     --phred33 \
     --dta \
-    --summary-file ${file_id}_AlignStat.txt \
+    --summary-file ${file_id}_align_report.txt \
     -x ${ht2_base} \
     -1 ${reads[0]} \
     -2 ${reads[1]} \

@@ -35,6 +35,7 @@ params.unstranded = false
 params.rmrRNA = false
 params.aligner = 'hisat2'
 params.db = "${workflow.projectDir.getParent()}/${params.genome}_${params.ens_rls}/"
+params.multiqc_config = "${workflow.projectDir}/multiqc_config.yaml"
 
 //Include modules to main pipeline
 include { make_rRNA_db } from './modules/make_rRNA_db.nf' addParams(species: params.species, outdir: params.db)
@@ -72,7 +73,7 @@ if( params.aligner == 'hisat2') {
     include { hisat2_sort } from './modules/hisat2_sort.nf'
 }
 include { htseq_count } from './modules/htseq_count.nf'
-include { multiqc } from './modules/multiqc.nf'
+include { multiqc } from './modules/multiqc.nf' addParams(multiqc_config: params.multiqc_config)
 
 workflow DLP {
 
@@ -199,26 +200,26 @@ workflow DLP {
     //Perform fastqc on pretrimmed reads, trim reads, and perform fastqc on trimmed reads
     pretrim_fastqc(reads_ch)
     trim_galore(reads_ch)
-    posttrim_fastqc(trim_galore.out)
+    posttrim_fastqc(trim_galore.out[0])
 
     //Steps if user specifies for samples to have ribosomal RNA filtering (default = true)
     //rRNA filter trimmed reads
     if( params.rmrRNA ) {
-        sortMeRNA(trim_galore.out.combine(rRNAdb))
+        sortMeRNA(trim_galore.out[0].combine(rRNAdb))
         //skip repair_fastq process if fastq is single-end
         if( params.singleEnd ) {
-            sortmerna_fastqc(sortMeRNA.out)
-            filtered_fastq = sortMeRNA.out
+            sortmerna_fastqc(sortMeRNA.out[0])
+            filtered_fastq = sortMeRNA.out[0]
         }
         else {
-            repair_fastq(sortMeRNA.out)
+            repair_fastq(sortMeRNA.out[0])
             sortmerna_fastqc(repair_fastq.out)
             filtered_fastq = repair_fastq.out
         }
     }
 
     else {
-        filtered_fastq = trim_galore.out
+        filtered_fastq = trim_galore.out[0]
     }
         
 
@@ -231,8 +232,8 @@ workflow DLP {
     //Conditional processes depending on aligner chosen (default = hisat2)
     if( params.aligner == 'hisat2') {
         hisat2_align(filtered_fastq.combine(ht2_base))
-        sam = hisat2_align.out
-        hisat2_sort(hisat2_align.out)
+        sam = hisat2_align.out[0]
+        hisat2_sort(hisat2_align.out[0])
         output = hisat2_sort.out
     }
     if( params.aligner == 'star') {
@@ -240,6 +241,13 @@ workflow DLP {
     }
     dexSeqCount(sam.combine(gff))
     htseq_count(hisat2_sort.out)
+
+    /*
+    ALIGN_COUNT WORKFLOW:
+    Trim reads with Trim Galore, 
+    Filter reads for rRNA,
+    Perform FastQC on reads before and after trim/filter
+    */
 }
 
 /*

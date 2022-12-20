@@ -24,6 +24,7 @@ Define local params
 */
 params.outdir = "./results"
 params.pubdir = "multiqc"
+params.multiqc_config = ""
 
 process multiqc {
     executor = 'slurm'
@@ -33,13 +34,14 @@ process multiqc {
     publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
     
     input:
-    file('fastqc/*')
+    file multiqc_config
+    file('multiqc_input/*')
 
     output:
     file('*multiqc_report.html')
 
     script:
     """
-    multiqc results/
+    multiqc multiqc_input/ --config ${multiqc_config}
     """
 }

@@ -42,7 +42,8 @@ process sortMeRNA {
     tuple val(file_id), file(reads), file(rRNAdb)
 
     output:
-    tuple val(file_id), path("*rmrRNA*.fq.gz"), path("*.log")
+    tuple val(file_id), path("*rmrRNA*.fq.gz")
+    path("*.log"), emit: smr_log
 
     script:
     if( params.singleEnd )
