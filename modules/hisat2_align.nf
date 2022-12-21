@@ -61,6 +61,7 @@ process hisat2_align {
     --verbose \
     --phred33 \
     --dta \
+    --new-summary \
     --summary-file ${file_id}_align_report.txt \
     -x ${ht2_base} \
     -U ${reads} \
@@ -74,6 +75,7 @@ process hisat2_align {
     --verbose \
     --phred33 \
     --dta \
+    --new-summary \
     --summary-file ${file_id}_align_report.txt \
     -x ${ht2_base} \
     -1 ${reads[0]} \

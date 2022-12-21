@@ -21,5 +21,7 @@ module_order:
         path_filters:
             - '*_repaired_R[12]_fastqc.zip'
             - '*_rmrRNA_fastqc.zip'
-    - hisat2
+    - hisat2:
+        contents: 'HISAT2 summary stats'
+        shared: true
     - htseq
