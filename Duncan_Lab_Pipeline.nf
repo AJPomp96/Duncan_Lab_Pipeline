@@ -48,7 +48,7 @@ include { genEnsAnnot } from './modules/genEnsAnnot.nf' addParams(outdir: params
 include { dexSeqPrep } from './modules/dexSeqPrep.nf' addParams(outdir: params.db)
 
 include { fastqc as pretrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'pretrim_fastqc')
-include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'postrim_fastqc')
+include { fastqc as posttrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'posttrim_fastqc')
 include { fastqc as sortmerna_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'sortmerna_fastqc')
 include { fastqc as ribotrim_fastqc } from './modules/fastqc.nf' addParams(pubdir: 'ribotrim_fastqc')
 include { trim_galore } from './modules/trim_galore.nf'
@@ -152,7 +152,6 @@ workflow DLP {
     }
     else{
         ht2_base = Channel.from("${params.db}${params.genome}_${params.ens_rls}")
-        ht2_base.view()
     }
 
     //Detect if length file exists, if not, extract lengths
@@ -247,7 +246,7 @@ workflow DLP {
     */
 
     //combine all output files necessary for multiqc report into one channel
-    multiqc_input = pretrim_fastqc.out.combine(trim_galore.out.trimming_report, postrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, htseq_count.out)
+    multiqc_input = pretrim_fastqc.out.concat(trim_galore.out.trimming_report, posttrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, htseq_count.out)
     multiqc_input.view()
 }
 
