@@ -26,9 +26,10 @@ params.outdir = "./results"
 params.pubdir = "dexseq"
 
 process dexSeqCount {
-    //container 'duncan_lab'
+    container 'duncan_lab'
+    maxForks 3
     executor = 'slurm'
-    //clusterOptions '--partition=docker --account=docker'
+    clusterOptions '--partition=docker --account=docker'
     memory '128 GB'
     cpus 2
 
@@ -52,10 +53,8 @@ process dexSeqCount {
 	-o !{file_id}.sorted.bam \
     !{file_id}.bam
 
-    #python3 \
-    #/usr/local/lib/R/site-library/DEXSeq/python_scripts/dexseq_count.py \
-    
-    dexseq_count.py \
+    python3 \
+    /usr/local/lib/R/site-library/DEXSeq/python_scripts/dexseq_count.py \
     !{gff} \
     !{sam} \
     !{file_id}_dxsq.txt
