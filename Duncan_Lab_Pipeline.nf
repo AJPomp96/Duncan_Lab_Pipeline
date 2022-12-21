@@ -245,9 +245,14 @@ workflow DLP {
     HiSAT2_Report, HTSeq_Report
     */
 
-    //combine all output files necessary for multiqc report into one channel
-    multiqc_input = pretrim_fastqc.out.concat(trim_galore.out.trimming_report, posttrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, htseq_count.out)
+    //Combine all output files necessary for multiqc report into one channel
+    multiqc_input = pretrim_fastqc.out
+    multiqc_input.concat(trim_galore.out.trimming_report, posttrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, htseq_count.out)
+    
     multiqc_input.view()
+
+    //Run MultiQC to create compiled QC report
+    multiqc(params.multiqc_config, multiqc_input)
 }
 
 /*

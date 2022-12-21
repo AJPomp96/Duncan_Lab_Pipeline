@@ -34,11 +34,11 @@ process multiqc {
     publishDir "${params.outdir}/${params.pubdir}", mode: 'copy'
     
     input:
-    file multiqc_config
-    file('multiqc_input/*')
+    path(multiqc_config)
+    path('multiqc_input/*')
 
     output:
-    file('*multiqc_report.html')
+    path('*multiqc_report.html')
 
     script:
     """
