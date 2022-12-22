@@ -1,4 +1,4 @@
- # Docker inheritance
+# Docker inheritance
 FROM bioconductor/bioconductor_docker:devel
 
 #define bbtools version

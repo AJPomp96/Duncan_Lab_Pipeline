@@ -247,8 +247,8 @@ workflow DLP {
 
     //Combine all output files necessary for multiqc report into one channel
     //Wait until htseq_count is finished to concat all the reports into a single channel
-    multiqc_input = htseq_count.out
-    multiqc_input.concat(trim_galore.out.trimming_report, posttrim_fastqc.out, sortMeRNA.out.smr_log, sortmerna_fastqc.out, hisat2_align.out.align_report, pretrim_fastqc.out)
+    multiqc_input = htseq_count.out.collect()
+    multiqc_input.concat(trim_galore.out.trimming_report.collect(), posttrim_fastqc.out.collect(), sortMeRNA.out.smr_log.collect(), sortmerna_fastqc.out.collect(), hisat2_align.out.align_report.collect(), pretrim_fastqc.out.collect())
     
     multiqc_input.view()
 
