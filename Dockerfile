@@ -35,7 +35,7 @@ RUN wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9
 RUN R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXSeq"))'
 
 #Install required R package
-RUN Rscript -e 'install.packages("tidyverse")'
+RUN R -e 'install.packages("tidyverse")'
 
 #add dexseq py scripts to path
 ENV PATH="${PATH}:/usr/local/lib/R/site-library/DEXSeq/python_scripts"
