@@ -38,7 +38,12 @@ RUN R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXSeq"))'
 RUN R -e 'install.packages("tidyverse")'
 
 #add dexseq py scripts to path
-ENV PATH="${PATH}:/usr/local/lib/R/site-library/DEXSeq/python_scripts"
+ENV DEXSEQPATH="/usr/local/lib/R/site-library/DEXSeq/python_scripts"
+ENV PATH="${PATH}:${DEXSEQPATH}"
+RUN sed -i '1 i #!/usr/bin/env python3' "${DEXSEQPATH}/dexseq_count.py"
+RUN sed -i '1 i #!/usr/bin/env python3' "${DEXSEQPATH}/dexseq_prepare_annotation.py"
+RUN chmod +x "${DEXSEQPATH}/dexseq_count.py"
+RUN chmod +x "${DEXSEQPATH}/dexseq_prepare_annotation.py"
 
 #add samtools to the path
 ENV PATH=/samtools-1.9:${PATH}

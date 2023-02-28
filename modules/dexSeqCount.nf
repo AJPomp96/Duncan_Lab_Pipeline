@@ -53,8 +53,7 @@ process dexSeqCount {
 	-o !{file_id}.sorted.bam \
     !{file_id}.bam
 
-    python3 \
-    /usr/local/lib/R/site-library/DEXSeq/python_scripts/dexseq_count.py \
+    dexseq_count.py \
     !{gff} \
     !{sam} \
     !{file_id}_dxsq.txt
