@@ -22,7 +22,7 @@ RUN update-alternatives --set python /usr/bin/python3.7
 RUN sudo apt-get -y install python3.7-distutils
 
 #install HTSeq
-RUN python -m pip install HTSeq
+RUN python -m pip install --root-user-action=ignore HTSeq
 
 #install bbmap
 RUN wget --progress=dot:giga https://sourceforge.net/projects/bbmap/files/BBMap_${BBTOOLSVER}.tar.gz && \
