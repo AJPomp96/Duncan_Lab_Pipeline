@@ -14,7 +14,7 @@ RUN apt-get update -y
 #RUN update-alternatives --set python /usr/bin/python3.7
 
 #install HTSeq
-sudo apt-get -y install build-essential python3.6-dev python-numpy python-matplotlib python-pysam python-htseq
+RUN sudo apt-get -y install build-essential python3.6-dev python-numpy python-matplotlib python-pysam python-htseq
 
 #install bbmap
 RUN wget --progress=dot:giga https://sourceforge.net/projects/bbmap/files/BBMap_${BBTOOLSVER}.tar.gz && \
