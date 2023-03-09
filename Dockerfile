@@ -8,13 +8,14 @@ ARG BBTOOLSVER=38.96
 RUN apt-get update -y
 
 # Add 3.7 to the available alternatives
-#RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 
 # Set python3.7 as the default python
-#RUN update-alternatives --set python /usr/bin/python3.7
+RUN update-alternatives --set python /usr/bin/python3.7
 
 #install HTSeq
-RUN sudo apt-get -y install build-essential python3.6-dev python-numpy python-matplotlib python-pysam python-htseq
+#RUN sudo apt-get -y install build-essential python3.6-dev python-numpy python-matplotlib python-pysam python-htseq
+RUN pip install HTSeq
 
 #install bbmap
 RUN wget --progress=dot:giga https://sourceforge.net/projects/bbmap/files/BBMap_${BBTOOLSVER}.tar.gz && \
