@@ -7,6 +7,11 @@ ARG BBTOOLSVER=38.96
 # Update apt-get
 RUN apt-get update -y
 
+# Install python 3.7
+RUN apt install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt install python3.7 -y
+
 # Add 3.7 to the available alternatives
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 
