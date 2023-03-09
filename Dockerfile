@@ -19,7 +19,7 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN update-alternatives --set python /usr/bin/python3.7
 
 #install distutils for python
-RUN sudo apt-get install python3.7-distutils
+RUN sudo apt-get -y install python3.7-distutils
 
 #install HTSeq
 RUN python -m pip install HTSeq
