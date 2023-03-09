@@ -47,8 +47,8 @@ RUN R -e 'install.packages(c("tidyverse", "XML"))'
 #add dexseq py scripts to path
 ENV DEXSEQPATH="/usr/local/lib/R/site-library/DEXSeq/python_scripts"
 ENV PATH="${PATH}:${DEXSEQPATH}"
-RUN sed -i '1 i #!/usr/bin/env python2.7' "${DEXSEQPATH}/dexseq_count.py"
-RUN sed -i '1 i #!/usr/bin/env python2.7' "${DEXSEQPATH}/dexseq_prepare_annotation.py"
+RUN sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_count.py"
+RUN sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_prepare_annotation.py"
 RUN chmod +x "${DEXSEQPATH}/dexseq_count.py"
 RUN chmod +x "${DEXSEQPATH}/dexseq_prepare_annotation.py"
 
