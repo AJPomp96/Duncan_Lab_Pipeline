@@ -51,9 +51,20 @@ RUN R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXSeq"))'
 #Install required R package
 RUN R -e 'install.packages(c("tidyverse", "XML"))'
 
-#add dexseq py scripts to path
-ENV DEXSEQPATH="/usr/local/lib/R/site-library/DEXSeq/python_scripts"
+# Download dexseq python scripts
+RUN mkdir dexseq_python_scripts
+ENV DEXSEQPATH="/dexseq_python_scripts"
+RUN wget https://github.com/areyesq89/DEXSeq/blob/master/inst/python_scripts/dexseq_prepare_annotation.py -P ${DEXSEQPATH}
+RUN wget https://github.com/areyesq89/DEXSeq/blob/master/inst/python_scripts/dexseq_count.py -P ${DEXSEQPATH}
+
+# Add dexseq py scripts to path
 ENV PATH="${PATH}:${DEXSEQPATH}"
+RUN ls ${DEXSEQPATH}
+
+
+#ENV DEXSEQPATH="/usr/local/lib/R/site-library/DEXSeq/python_scripts"
+
+# make dexseq script executable
 RUN sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_count.py"
 RUN sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_prepare_annotation.py"
 RUN chmod +x "${DEXSEQPATH}/dexseq_count.py"
