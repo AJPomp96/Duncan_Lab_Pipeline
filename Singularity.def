@@ -1,0 +1,92 @@
+Bootstrap: docker
+From: bioconductor/bioconductor_docker:devel
+Stage: spython-base
+
+%post
+# Docker inheritance
+
+#define bbtools version
+BBTOOLSVER=38.96
+
+# Update apt-get
+apt-get update -y
+
+# Install python 3.7
+apt install software-properties-common -y
+add-apt-repository ppa:deadsnakes/ppa
+apt install python3.7 -y
+apt-get install python3.7-dev -y
+
+# Add 3.7 to the available alternatives
+update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
+
+# Set python3.7 as the default python
+update-alternatives --set python /usr/bin/python3.7
+
+#install distutils for python
+apt-get -y install python3.7-distutils
+
+#install HTSeq
+python -m pip install HTSeq
+
+#install bbmap
+wget --progress=dot:giga https://sourceforge.net/projects/bbmap/files/BBMap_${BBTOOLSVER}.tar.gz && \
+tar -xzf BBMap_${BBTOOLSVER}.tar.gz && \
+rm BBMap_${BBTOOLSVER}.tar.gz && \
+ln -s /opt/bbmap/*.sh /usr/local/bin/
+
+#install fastx_toolkit pre-compiled binaries
+mkdir fastx_bin && \
+cd fastx_bin && \
+wget http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2 && \
+tar -xjf fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2 && \
+cp ./bin/* /usr/local/bin
+
+#install samtools
+wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2 && \
+tar jxf samtools-1.9.tar.bz2 && \
+rm samtools-1.9.tar.bz2 && \
+cd samtools-1.9 && \
+./configure --prefix $(pwd) && \
+make
+
+# Install required Bioconductor package
+R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXSeq"))'
+
+#Install required R package
+R -e 'install.packages(c("tidyverse", "XML"))'
+
+#Install sortmerna
+wget https://github.com/biocore/sortmerna/releases/download/v4.3.6/sortmerna-4.3.6-Linux.sh
+bash sortmerna-4.3.6-Linux.sh --skip-license
+
+# Download dexseq python scripts
+mkdir dexseq_python_scripts
+DEXSEQPATH="/dexseq_python_scripts"
+wget https://raw.githubusercontent.com/areyesq89/DEXSeq/master/inst/python_scripts/dexseq_count.py -P ${DEXSEQPATH}
+wget https://raw.githubusercontent.com/areyesq89/DEXSeq/master/inst/python_scripts/dexseq_prepare_annotation.py -P ${DEXSEQPATH}
+
+# Add dexseq py scripts to path
+PATH="${PATH}:${DEXSEQPATH}"
+ls ${DEXSEQPATH}
+
+# make dexseq script executable
+sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_count.py"
+sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_prepare_annotation.py"
+chmod +x "${DEXSEQPATH}/dexseq_count.py"
+chmod +x "${DEXSEQPATH}/dexseq_prepare_annotation.py"
+
+#add samtools to the path
+PATH=/samtools-1.9:${PATH}
+
+#add bbmap to the path
+PATH="${PATH}:/bbmap"
+%environment
+export DEXSEQPATH="/dexseq_python_scripts"
+export PATH="${PATH}:${DEXSEQPATH}"
+export PATH=/samtools-1.9:${PATH}
+export PATH="${PATH}:/bbmap"
+%runscript
+exec /bin/bash "$@"
+%startscript
+exec /bin/bash "$@"

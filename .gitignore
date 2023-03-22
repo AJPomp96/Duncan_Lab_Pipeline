@@ -1,15 +1,12 @@
 #ignore everything
-*
-!*/
-
-#track these
-!.gitignore
-!modules/
-!modules/*
-!nextflow.config
-!Duncan_Lab_Pipeline.nf
-!README.md
-!Dockerfile
-!.dockerignore
-!nextflow.sh
-!multiqc_config.yaml
+work/
+work/*
+fastq/*
+fastq/
+slurm-out/
+slurm-out/*
+.nextflow.log
+.nextflow/
+.nextflow/*
+results/
+results/*

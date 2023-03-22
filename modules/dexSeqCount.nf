@@ -26,10 +26,8 @@ params.outdir = "./results"
 params.pubdir = "dexseq"
 
 process dexSeqCount {
-    container 'duncan_lab:latest'
     maxForks 3
     executor = 'slurm'
-    clusterOptions '--partition=docker --account=docker'
     memory '32 GB'
     cpus 2
 

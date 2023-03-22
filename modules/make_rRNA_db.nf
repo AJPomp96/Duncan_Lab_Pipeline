@@ -27,9 +27,7 @@ params.outdir = "./db"
 params.species = "mus_musculus"
 
 process make_rRNA_db{
-    container 'duncan_lab'
     executor 'slurm'
-    clusterOptions '--partition=docker --account=docker'
     memory '64 GB'
     cpus 2
 

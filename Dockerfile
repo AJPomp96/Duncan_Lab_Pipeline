@@ -11,6 +11,7 @@ RUN apt-get update -y
 RUN apt install software-properties-common -y
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt install python3.7 -y
+RUN apt-get install python3.7-dev -y
 
 # Add 3.7 to the available alternatives
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
@@ -19,10 +20,10 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
 RUN update-alternatives --set python /usr/bin/python3.7
 
 #install distutils for python
-RUN sudo apt-get -y install python3.7-distutils
+RUN apt-get -y install python3.7-distutils
 
 #install HTSeq
-RUN python -m pip install --root-user-action=ignore HTSeq
+RUN python -m pip install HTSeq
 
 #install bbmap
 RUN wget --progress=dot:giga https://sourceforge.net/projects/bbmap/files/BBMap_${BBTOOLSVER}.tar.gz && \
@@ -51,18 +52,19 @@ RUN R -e 'BiocManager::install(c("biomaRt", "GenomicFeatures", "DEXSeq"))'
 #Install required R package
 RUN R -e 'install.packages(c("tidyverse", "XML"))'
 
+#Install sortmerna
+RUN wget https://github.com/biocore/sortmerna/releases/download/v4.3.6/sortmerna-4.3.6-Linux.sh
+RUN bash sortmerna-4.3.6-Linux.sh --skip-license
+
 # Download dexseq python scripts
 RUN mkdir dexseq_python_scripts
 ENV DEXSEQPATH="/dexseq_python_scripts"
-RUN wget https://github.com/areyesq89/DEXSeq/blob/master/inst/python_scripts/dexseq_prepare_annotation.py -P ${DEXSEQPATH}
-RUN wget https://github.com/areyesq89/DEXSeq/blob/master/inst/python_scripts/dexseq_count.py -P ${DEXSEQPATH}
+RUN wget https://raw.githubusercontent.com/areyesq89/DEXSeq/master/inst/python_scripts/dexseq_count.py -P ${DEXSEQPATH}
+RUN wget https://raw.githubusercontent.com/areyesq89/DEXSeq/master/inst/python_scripts/dexseq_prepare_annotation.py -P ${DEXSEQPATH}
 
 # Add dexseq py scripts to path
 ENV PATH="${PATH}:${DEXSEQPATH}"
 RUN ls ${DEXSEQPATH}
-
-
-#ENV DEXSEQPATH="/usr/local/lib/R/site-library/DEXSeq/python_scripts"
 
 # make dexseq script executable
 RUN sed -i '1 i #!/usr/bin/env python' "${DEXSEQPATH}/dexseq_count.py"
