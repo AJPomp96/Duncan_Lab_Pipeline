@@ -10,3 +10,4 @@ slurm-out/*
 .nextflow/*
 results/
 results/*
+duncan_lab.sif
